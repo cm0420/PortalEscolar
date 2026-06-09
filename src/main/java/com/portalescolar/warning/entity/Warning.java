@@ -43,20 +43,19 @@ public class Warning {
     private Boolean active = true;
 
 
-    public boolean pinned() {
-        return this.pinned = true;
+    public void pin() {
+        this.pinned = true;
     }
-    public boolean unpinned() {
-        return this.pinned = false;
+    public void unpin() {
+        this.pinned = false;
     }
-
-    public boolean archived() {
-        return this.active = false;
+    public void archive() {
+        this.active = false;
     }
-    public boolean unarchived() {
-        return this.active = true;
+    public void unarchive() {
+        this.active = true;
     }
-    public boolean isUrgent(){
+    public boolean isUrgent() {
         return priority == Priority.HIGH;
     }
 

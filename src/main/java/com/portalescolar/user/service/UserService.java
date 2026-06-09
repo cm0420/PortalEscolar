@@ -11,6 +11,7 @@ import com.portalescolar.user.entity.Role;
 import com.portalescolar.user.entity.User;
 import com.portalescolar.user.mapper.UserMapper;
 import com.portalescolar.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -28,7 +30,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper mapper;
-
+    @Transactional
     public UserResponseDto save(UserRequestDto dto) {
         if (userRepository.existsByEmail(dto.email())) {
             throw new BusinessRuleException("E-mail já cadastrado.");
@@ -57,7 +59,7 @@ public class UserService {
 
         return mapper.toResponseDTO(userRepository.save(user));
     }
-
+    @Transactional(readOnly= true)
     public Page<UserResponseDto> findAll(Pageable pageable, String role) {
         if (role != null) {
             Role roleEnum;
@@ -72,7 +74,7 @@ public class UserService {
         return userRepository.findAll(pageable)
                 .map(mapper::toResponseDTO);
     }
-
+    @Transactional(readOnly= true)
     public UserResponseDto findById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
@@ -90,7 +92,7 @@ public class UserService {
         mapper.updateEntityFromDTO(dto, user);
         return mapper.toResponseDTO(userRepository.save(user));
     }
-
+    @Transactional
     public void updatePassword(UUID id, UserPasswordUpdateDto dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
@@ -106,7 +108,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(dto.newPassword()));
         userRepository.save(user);
     }
-
+    @Transactional
     public UserResponseDto toggleActive(UUID id, boolean active) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
@@ -114,6 +116,7 @@ public class UserService {
         return mapper.toResponseDTO(userRepository.save(user));
     }
 
+    @Transactional
     public void deactivate(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
@@ -121,7 +124,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // uso interno pelo UserDetailsServiceImpl
+    @Transactional(readOnly= true)
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));

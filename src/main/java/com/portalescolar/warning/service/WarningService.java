@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -20,13 +21,5 @@ public class WarningService {
     private final WarningRepository warningRepository;
     private final WarningMapper mapper;
 
-    public WarningResponseDto save(WarningRequestDto requestDto){
-        Warning warning= mapper.toEntity(requestDto);
-        Warning savedWarning= warningRepository.save(warning);
-        return mapper.toResponseDto(savedWarning);
-    }
 
-    public Page<WarningResponseDto> findbyPriority(Priority priority, Pageable pageable){
-        return warningRepository.findAllByActiveTrueAndPriority(priority, pageable).map(mapper::toResponseDto);
-    }
 }

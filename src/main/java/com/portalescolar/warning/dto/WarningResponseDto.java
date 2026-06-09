@@ -1,6 +1,7 @@
 package com.portalescolar.warning.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record WarningResponseDto(
@@ -10,6 +11,6 @@ public record WarningResponseDto(
         String priority,
         Boolean active,
         Boolean pinned,
-        LocalDate createdAt
+        LocalDateTime createdAt
 ) {
 }
