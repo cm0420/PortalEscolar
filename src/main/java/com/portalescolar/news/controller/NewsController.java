@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/news")
+@RequestMapping(value="/api/news", produces = MediaType.APPLICATION_JSON_VALUE)
 public class NewsController {
 
     private final NewsService newsService;
@@ -39,12 +40,12 @@ public class NewsController {
         return ResponseEntity.ok(newsService.findById(id, isAdmin));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<NewsResponseDto> save(@RequestBody @Valid NewsRequestDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(newsService.save(dto));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<NewsResponseDto> update(
             @PathVariable UUID id,
             @RequestBody @Valid NewsRequestDto dto) {
