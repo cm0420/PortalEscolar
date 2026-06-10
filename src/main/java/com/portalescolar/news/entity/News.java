@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "warnings")
+@Table(name = "news")
 public class News {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,7 +23,7 @@ public class News {
     @Column(name= "title",nullable = false, length = 200)
     private String title;
 
-    @Column(name = "subtitle",nullable = false, length = 200)
+    @Column(name = "subtitle", length = 200)
     private String subtitle;
 
     @Column(name = "body",columnDefinition = "TEXT", nullable = false)
@@ -41,11 +41,11 @@ public class News {
     private LocalDateTime createdAt;
 
 
-    @Column(name = "published_at", nullable = false)
+    @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
 

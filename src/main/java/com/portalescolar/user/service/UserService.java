@@ -44,13 +44,13 @@ public class UserService {
         }
 
         // Se tentar criar um ADMIN, só outro ADMIN pode
-        if (role == Role.ADMIN) {
+       /* if (role == Role.ADMIN) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             User requester = (User) auth.getPrincipal();
             if (!requester.isAdmin()) {
                 throw new BusinessRuleException("Apenas administradores podem criar outros administradores.");
             }
-        }
+        }*/
 
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.password()));

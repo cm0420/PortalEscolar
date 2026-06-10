@@ -8,8 +8,6 @@ import com.portalescolar.news.mapper.NewsMapper;
 import com.portalescolar.news.repository.NewsRepository;
 import com.portalescolar.shared.exception.BusinessRuleException;
 import com.portalescolar.shared.exception.ResourceNotFoundException;
-import com.portalescolar.user.entity.Role;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,18 +17,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
-
 @RequiredArgsConstructor
 public class NewsService {
 
-    private NewsRepository newsRepository;
+    private final NewsRepository newsRepository;
     private final NewsMapper newsMapper;
+
     @Transactional
     public NewsResponseDto save(NewsRequestDto dto) {
         News news = newsMapper.toEntity(dto);
         news.setNewsStatus(NewsStatus.DRAFT);
         return newsMapper.toResponseDto(newsRepository.save(news));
     }
+
     @Transactional(readOnly = true)
     public Page<NewsResponseDto> findAll(Pageable pageable, String status, boolean isAdmin) {
         if (status != null) {
@@ -38,14 +37,26 @@ public class NewsService {
             try {
                 statusEnum = NewsStatus.valueOf(status.toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new BusinessRuleException("Status invalido" + status);
+                throw new BusinessRuleException("Status inválido: " + status);
             }
+
             if (!isAdmin && statusEnum != NewsStatus.PUBLISHED) {
-                throw new BusinessRuleException("Acesso negado");
+                throw new BusinessRuleException("Acesso negado.");
             }
+
+            return newsRepository.findAllByNewsStatusOrderByPublishedAtDesc(statusEnum, pageable)
+                    .map(newsMapper::toResponseDto);
         }
-        return newsRepository.findAllByStatusOrderByPublishedAtDesc(status, pageable).map(newsMapper::toResponseDto);
+
+        if (isAdmin) {
+            return newsRepository.findAll(pageable)
+                    .map(newsMapper::toResponseDto);
+        }
+
+        return newsRepository.findAllByNewsStatusOrderByPublishedAtDesc(NewsStatus.PUBLISHED, pageable)
+                .map(newsMapper::toResponseDto);
     }
+
     @Transactional(readOnly = true)
     public NewsResponseDto findById(UUID id, boolean isAdmin) {
         if (isAdmin) {
@@ -54,16 +65,17 @@ public class NewsService {
             return newsMapper.toResponseDto(news);
         }
 
-        News news = newsRepository.findAllByIdAndStatus(id, NewsStatus.PUBLISHED)
+        News news = newsRepository.findAllByIdAndNewsStatus(id, NewsStatus.PUBLISHED)
                 .orElseThrow(() -> new ResourceNotFoundException("Notícia não encontrada."));
         return newsMapper.toResponseDto(news);
     }
+
     @Transactional
     public NewsResponseDto update(UUID id, NewsRequestDto dto) {
         News news = newsRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Notícia não encontrada."));
 
-        if (news.getNewsStatus()== NewsStatus.ARCHIVED) {
+        if (news.getNewsStatus() == NewsStatus.ARCHIVED) {
             throw new BusinessRuleException("Não é possível editar uma notícia arquivada.");
         }
 
@@ -121,6 +133,4 @@ public class NewsService {
 
         newsRepository.delete(news);
     }
-
-
 }

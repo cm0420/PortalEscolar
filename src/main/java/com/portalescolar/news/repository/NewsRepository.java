@@ -12,9 +12,9 @@ import java.util.UUID;
 
 public interface NewsRepository extends JpaRepository<News, UUID> {
 
-    Page<News> findAllByStatus(String status, Pageable pageable);
+    Page<News> findAllByNewsStatus(NewsStatus status, Pageable pageable);
 
-    Page<News> findAllByStatusOrderByPublishedAtDesc(String status, Pageable pageable);
+    Page<News> findAllByNewsStatusOrderByPublishedAtDesc(NewsStatus status, Pageable pageable);
 
-    Optional<News> findAllByIdAndStatus(UUID id, NewsStatus status);
+    Optional<News> findAllByIdAndNewsStatus(UUID id, NewsStatus status);
 }

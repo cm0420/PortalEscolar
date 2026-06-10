@@ -1,4 +1,4 @@
-package com.portalescolar.demo;
+package com.portalescolar;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -4,7 +4,6 @@ import com.portalescolar.news.dto.NewsRequestDto;
 import com.portalescolar.news.dto.NewsResponseDto;
 import com.portalescolar.news.service.NewsService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,15 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value="/api/news", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/news", produces = MediaType.APPLICATION_JSON_VALUE)
 public class NewsController {
 
     private final NewsService newsService;
@@ -45,7 +41,7 @@ public class NewsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newsService.save(dto));
     }
 
-    @PutMapping(value="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<NewsResponseDto> update(
             @PathVariable UUID id,
             @RequestBody @Valid NewsRequestDto dto) {
@@ -72,5 +68,4 @@ public class NewsController {
         newsService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }
