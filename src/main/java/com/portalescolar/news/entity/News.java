@@ -20,20 +20,20 @@ public class News {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name= "title",nullable = false, length = 200)
+    @Column(name = "title", nullable = false, length = 200)
     private String title;
 
     @Column(name = "subtitle", length = 200)
     private String subtitle;
 
-    @Column(name = "body",columnDefinition = "TEXT", nullable = false)
+    @Column(name = "body", columnDefinition = "TEXT", nullable = false)
     private String body;
 
     @Column(name = "image_url")
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status",columnDefinition = "TEXT", nullable = false)
+    @Column(name = "status", columnDefinition = "TEXT", nullable = false)
     private NewsStatus newsStatus;
 
     @CreationTimestamp
@@ -71,6 +71,5 @@ public class News {
         return this.newsStatus == NewsStatus.DRAFT;
     }
 
-
-
+    
 }

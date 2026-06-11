@@ -108,13 +108,14 @@ public class WarningService {
                 .orElseThrow(() -> new ResourceNotFoundException("Aviso não encontrado."));
 
         if (!warning.getActive()) {
-            throw new BusinessRuleException("Aviso já está arquivado.");
+           warning.unarchive();
+        }else {
+            warning.archive();
         }
 
-        warning.archive();
         return warningMapper.toResponseDto(warningRepository.save(warning));
     }
-
+    //hard delete
     @Transactional
     public void delete(UUID id) {
         Warning warning = warningRepository.findById(id)

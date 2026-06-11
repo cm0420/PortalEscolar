@@ -45,8 +45,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGeneric(Exception ex) {
+        ex.printStackTrace();
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", "Erro inesperado no servidor.");
     }
+
 
     private ResponseEntity<ErrorResponseDto> build(HttpStatus status, String error, String message) {
         return ResponseEntity.status(status).body(

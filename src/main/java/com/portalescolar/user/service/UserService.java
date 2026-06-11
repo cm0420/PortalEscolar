@@ -44,13 +44,13 @@ public class UserService {
         }
 
         // Se tentar criar um ADMIN, só outro ADMIN pode
-       /* if (role == Role.ADMIN) {
+        if (role == Role.ADMIN) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             User requester = (User) auth.getPrincipal();
             if (!requester.isAdmin()) {
                 throw new BusinessRuleException("Apenas administradores podem criar outros administradores.");
             }
-        }*/
+        }
 
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.password()));
@@ -108,14 +108,15 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(dto.newPassword()));
         userRepository.save(user);
     }
+    //soft dele because user can be reactivated
     @Transactional
-    public UserResponseDto toggleActive(UUID id, boolean active) {
+    public UserResponseDto toggleActive(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
-        user.setActive(active);
+        user.setActive(!user.getActive()); // inverte o estado atual
         return mapper.toResponseDTO(userRepository.save(user));
     }
-
+    //Unused method because toggleActive is enough
     @Transactional
     public void deactivate(UUID id) {
         User user = userRepository.findById(id)

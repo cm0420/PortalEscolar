@@ -33,20 +33,20 @@ public class UserController {
     public ResponseEntity<UserResponseDto> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(userService.findById(id));
     }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponseDto> save(@RequestBody @Valid UserRequestDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(dto));
     }
 
-    @PutMapping(value ="/{id}",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponseDto> update(
             @PathVariable UUID id,
             @RequestBody @Valid UserUpdateRequestDto dto) {
         return ResponseEntity.ok(userService.update(id, dto));
     }
 
-    @PatchMapping(value = "/{id}/senha", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/{id}/password", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updatePassword(
             @PathVariable UUID id,
             @RequestBody @Valid UserPasswordUpdateDto dto) {
@@ -55,9 +55,8 @@ public class UserController {
     }
 
 
-    @PatchMapping(value ="/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        userService.deactivate(id);
-        return ResponseEntity.noContent().build();
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<UserResponseDto> toggleActive(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.toggleActive(id));
     }
 }

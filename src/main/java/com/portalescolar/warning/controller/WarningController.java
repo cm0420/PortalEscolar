@@ -19,7 +19,7 @@ import java.util.UUID;
 public class WarningController {
     private final WarningService warningService;
 
-    @GetMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<WarningResponseDto>> findAll(
             @RequestParam(required = false) String priority,
             @RequestParam(required = false) Boolean includeInactive,

@@ -16,12 +16,12 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/news", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping( "/api/news")
 public class NewsController {
 
     private final NewsService newsService;
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<NewsResponseDto>> findAll(
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "false") boolean isAdmin,
@@ -29,19 +29,19 @@ public class NewsController {
         return ResponseEntity.ok(newsService.findAll(pageable, status, isAdmin));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<NewsResponseDto> findById(
             @PathVariable UUID id,
             @RequestParam(defaultValue = "false") boolean isAdmin) {
         return ResponseEntity.ok(newsService.findById(id, isAdmin));
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<NewsResponseDto> save(@RequestBody @Valid NewsRequestDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(newsService.save(dto));
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<NewsResponseDto> update(
             @PathVariable UUID id,
             @RequestBody @Valid NewsRequestDto dto) {
