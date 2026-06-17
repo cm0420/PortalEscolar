@@ -31,9 +31,12 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // votar — precisa estar autenticado
+                        .requestMatchers(HttpMethod.POST, "/api/polls/{id}/vote").authenticated()
 
                         // --- PÚBLICO --- nenhum token necessário
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+
 
                         // notícias: GET público (o service já filtra só PUBLISHED para não autenticados)
                         .requestMatchers(HttpMethod.GET, "/api/news").permitAll()
@@ -42,6 +45,11 @@ public class SecurityConfig {
                         // avisos: GET público (o service já filtra só ativos)
                         .requestMatchers(HttpMethod.GET, "/api/warnings").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/warnings/{id}").permitAll()
+
+                        // polls — GET público
+                        .requestMatchers(HttpMethod.GET, "/api/polls").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/polls/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/polls/{id}/result").permitAll()
 
                         // --- APENAS ADMIN ---
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
@@ -53,6 +61,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/news/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/news/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/news/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/polls").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/polls/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/polls/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/polls/**").hasRole("ADMIN")
 
                         // qualquer outra rota precisa estar autenticado
                         .anyRequest().authenticated()
