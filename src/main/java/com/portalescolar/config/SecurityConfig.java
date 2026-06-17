@@ -1,24 +1,27 @@
 package com.portalescolar.config;
 
+import com.portalescolar.auth.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final UserDetailsServiceImpl userDetailsService;
+    private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -28,9 +31,36 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+
+                        // --- PÚBLICO --- nenhum token necessário
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+
+                        // notícias: GET público (o service já filtra só PUBLISHED para não autenticados)
+                        .requestMatchers(HttpMethod.GET, "/api/news").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/news/{id}").permitAll()
+
+                        // avisos: GET público (o service já filtra só ativos)
+                        .requestMatchers(HttpMethod.GET, "/api/warnings").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/warnings/{id}").permitAll()
+
+                        // --- APENAS ADMIN ---
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/warnings").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/warnings/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/warnings/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/warnings/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/news").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/news/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/news/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/news/**").hasRole("ADMIN")
+
+                        // qualquer outra rota precisa estar autenticado
+                        .anyRequest().authenticated()
                 )
-                .userDetailsService(userDetailsService);
+                .userDetailsService(userDetailsService)
+                // registra o filtro JWT ANTES do filtro padrão de autenticação
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
