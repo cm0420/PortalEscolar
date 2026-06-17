@@ -18,7 +18,7 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration-hours")
+    @Value("${jwt.expiration-hours}")
     private int expirationHours;
 
     private SecretKey getSigningKey() {
