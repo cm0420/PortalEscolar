@@ -6,6 +6,7 @@ target/
 .env
 *.env
 !.env.example
+application-test.properties
 ### STS ###
 .apt_generated
 .classpath
