@@ -9,6 +9,7 @@ import com.portalescolar.user.mapper.UserMapper;
 import com.portalescolar.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +25,15 @@ public class AuthService {
 
     public LoginResponseDto login(LoginRequestDto dto) {
         try {
-            // 1. autentica email e senha — lança exceção se inválido
+            // 1. autentica email e senha
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(dto.email(), dto.password())
             );
+        } catch (DisabledException e) {
+            // Captura PRIMEIRO o erro de inatividade gerado pelo UserDetails
+            throw new BusinessRuleException("Usuário desativado. Entre em contato com o administrador.");
         } catch (AuthenticationException e) {
+            // Captura senha errada e outros problemas genéricos de autenticação
             throw new BusinessRuleException("Email ou senha inválidos.");
         }
 
@@ -36,7 +41,10 @@ public class AuthService {
         User user = userRepository.findByEmail(dto.email())
                 .orElseThrow(() -> new BusinessRuleException("Usuário não encontrado."));
 
-        // 3. verifica se está ativo
+        // 3. verifica se está ativo (Opcional)
+        // Nota: Como o Spring Security já lança a DisabledException lá no Passo 1
+        // (se o seu UserDetails configurou isEnabled corretamente),
+        // esse passo 3 acaba virando apenas uma camada de segurança extra.
         if (!user.getActive()) {
             throw new BusinessRuleException("Usuário desativado. Entre em contato com o administrador.");
         }
